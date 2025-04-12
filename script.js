@@ -264,13 +264,13 @@ checkOutBtn.addEventListener("click", function(){
         const message = encodeURI(`Olá! Gostaria de fazer um pedido:\n\n${cartItens}\nTotal: R$ ${total.toFixed(2)}\n\nForma de Pagamento: *${valorSelecionado}*\nValor Pagamento: *${trocoValue.value}*
         \nTroco: *R$ ${trocoCalculado.toFixed(2)}*`)
 
-        const phone = "12997918975"
+        const phone = "12996860694"
 
         window.open(`https://wa.me/${phone}?text=${message}`,"_blank")
     }else{
         const message = encodeURI(`Olá! Gostaria de fazer um pedido:\n\n${cartItens}\nTotal: R$ ${total.toFixed(2)}\nForma de Pagamento: *${valorSelecionado}*`)
 
-        const phone = "12997918975"
+        const phone = "12996860694"
     
         window.open(`https://wa.me/${phone}?text=${message}`,"_blank")
     }
