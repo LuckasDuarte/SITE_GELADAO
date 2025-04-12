@@ -7,9 +7,6 @@ const cartTotal = document.getElementById("cart-total")
 const checkOutBtn = document.getElementById("checkout-btn")
 const closeModalBtn = document.getElementById("close-modal-btn")
 const cartCount = document.getElementById("cart-count")
-const adressInput = document.getElementById("adress")
-const adressWarning = document.getElementById("adress-warn")
-
 
 // Obtenha a referência para o seletor de pagamento e o campo de troco
 const paymentMethodSelect = document.getElementById("payment-method");
@@ -184,16 +181,6 @@ function removeItemCart(name){
     }
 }
 
-adressInput.addEventListener("input", function(event){
-    let inputValue = event.target.value;
-
-    if(inputValue !== ""){
-        adressInput.classList.remove("border-red-500")
-        adressWarning.classList.add("hidden")
-    }
-
-})
-
 
 // Finalizar Pedido
 checkOutBtn.addEventListener("click", function(){
@@ -218,12 +205,6 @@ checkOutBtn.addEventListener("click", function(){
 
     if(cart.length === 0) return;
 
-    if(adressInput.value === ""){
-        adressWarning.classList.remove("hidden")
-        adressInput.classList.add("border-red-500")
-        return;
-    }
-
     // Calcula o total dos itens no carrinho
     let total = 0;
     cart.forEach(item => {
@@ -233,9 +214,9 @@ checkOutBtn.addEventListener("click", function(){
     // enviar via whatsapp
     const cartItens = cart.map((item) => {
         return(
-`${item.name}
-Quantidade: ( ${item.qtd} )
-Preço: R$ ${item.price.toFixed(2)}\n\n`
+        `${item.name}
+        Quantidade: ( ${item.qtd} )
+        Preço: R$ ${item.price.toFixed(2)}\n\n`
             )
     }).join("")
 
@@ -243,17 +224,53 @@ Preço: R$ ${item.price.toFixed(2)}\n\n`
 
     if(valorSelecionado === "Dinheiro"){
 
-        
+        // Pegando e tratando o valor inserido
+        const valorPagamentoStr = trocoValue.value.trim().replace("R$", "").replace(",", ".").replace(" ", "");
+        const valorPagamento = parseFloat(valorPagamentoStr);
 
-        const message = encodeURI(`Olá! Gostaria de fazer um pedido:\n\n${cartItens}Endereço: ${adressInput.value}\nTotal: R$ ${total.toFixed(2)}\nForma de Pagamento: *${valorSelecionado}*\nValor Pagamento: *${trocoValue.value}*`)
+        if (isNaN(valorPagamento)) {
+            Toastify({
+                text: `Insira um valor válido para o pagamento`,
+                duration: 3000,
+                close: true,
+                gravity: "top", // `top` or `bottom`
+                position: "left", // `left`, `center` or `right`
+                stopOnFocus: true, // Prevents dismissing of toast on hover
+                style: {
+                    background: "#ef4444",
+                },
+            }).showToast();
+            return;
+        }
 
-        const phone = "12996860694"
+        if (valorPagamento < total) {
+            Toastify({
+                text: `O valor pago (R$ ${valorPagamento.toFixed(2)}) é menor que o total do pedido (R$ ${total.toFixed(2)}).`,
+                duration: 3000,
+                close: true,
+                gravity: "top", // `top` or `bottom`
+                position: "left", // `left`, `center` or `right`
+                stopOnFocus: true, // Prevents dismissing of toast on hover
+                style: {
+                    background: "#ef4444",
+                },
+            }).showToast();
+
+            return;
+        }
+
+        const trocoCalculado = valorPagamento - total;
+
+        const message = encodeURI(`Olá! Gostaria de fazer um pedido:\n\n${cartItens}\nTotal: R$ ${total.toFixed(2)}\n\nForma de Pagamento: *${valorSelecionado}*\nValor Pagamento: *${trocoValue.value}*
+        \nTroco: *R$ ${trocoCalculado.toFixed(2)}*`)
+
+        const phone = "12997918975"
 
         window.open(`https://wa.me/${phone}?text=${message}`,"_blank")
     }else{
-        const message = encodeURI(`Olá! Gostaria de fazer um pedido:\n\n${cartItens}Endereço: ${adressInput.value}\nTotal: R$ ${total.toFixed(2)}\nForma de Pagamento: *${valorSelecionado}*`)
+        const message = encodeURI(`Olá! Gostaria de fazer um pedido:\n\n${cartItens}\nTotal: R$ ${total.toFixed(2)}\nForma de Pagamento: *${valorSelecionado}*`)
 
-        const phone = "12996860694"
+        const phone = "12997918975"
     
         window.open(`https://wa.me/${phone}?text=${message}`,"_blank")
     }
@@ -272,7 +289,7 @@ function checkOpen(){
     const data = new Date();
     const hora = data.getHours();
   
-    return hora >= 6 && hora < 20; // True = aberto
+    return hora >= 6 && hora < 21; // True = aberto
 }
 
 const spanDate = document.getElementById("date-span")
